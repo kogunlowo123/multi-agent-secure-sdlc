@@ -1,0 +1,47 @@
+name: Agent Feature Request
+description: Request a new AI agent capability or improvement
+title: "[Agent]: "
+labels: ["enhancement", "agent"]
+body:
+  - type: dropdown
+    id: agent-type
+    attributes:
+      label: Agent Type
+      description: Which agent should this feature apply to?
+      options:
+        - code-reviewer
+        - sast-analyst
+        - release-gater
+        - new-agent
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe the specific security use case this agent feature should handle.
+    validations:
+      required: true
+
+  - type: textarea
+    id: inputs
+    attributes:
+      label: Expected Inputs
+      description: What inputs should the agent receive for this capability?
+    validations:
+      required: true
+
+  - type: textarea
+    id: outputs
+    attributes:
+      label: Expected Outputs
+      description: What structured output should the agent produce?
+    validations:
+      required: true
+
+  - type: textarea
+    id: security-context
+    attributes:
+      label: Security Standards
+      description: Which security standards are relevant? (OWASP, CWE, CVE, etc.)

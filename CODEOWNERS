@@ -1,0 +1,20 @@
+# Global owners
+* @kogunlowo123
+
+# Infrastructure
+/infra/ @kogunlowo123
+/deploy/ @kogunlowo123
+
+# Security-sensitive files
+/security/ @kogunlowo123
+/identity/ @kogunlowo123
+/.github/workflows/ @kogunlowo123
+
+# Core services
+/services/api/ @kogunlowo123
+/services/agent-runtime/ @kogunlowo123
+/services/rag-core/ @kogunlowo123
+
+# Tests
+/tests/ @kogunlowo123
+/evals/ @kogunlowo123

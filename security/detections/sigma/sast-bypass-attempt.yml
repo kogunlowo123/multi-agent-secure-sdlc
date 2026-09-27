@@ -1,0 +1,27 @@
+title: SAST Gate Bypass Attempt
+id: b5e9f3c2-4a8d-5f0b-c6g7-2d3e4f5g6b7c
+status: stable
+description: >
+  Detects attempts to mark SAST as passed while code contains known
+  high-risk patterns, potentially indicating a bypass of the SAST gate.
+author: Security Operations
+date: 2024/01/01
+logsource:
+  category: webserver
+  service: secure-sdlc-api
+detection:
+  selection:
+    cs-uri-stem|contains: "/api/v1/release/gate"
+    cs-method: POST
+    sast_passed: "true"
+    sc-status: 200
+  selection_blockers:
+    response_blockers_count|gt: 0
+    response_decision: "NO-GO"
+  condition: selection and not selection_blockers
+falsepositives:
+  - SAST passed but code review found new issues
+level: medium
+tags:
+  - attack.defense_evasion
+  - attack.T1562.001

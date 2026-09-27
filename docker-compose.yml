@@ -1,0 +1,92 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://sdlc_user:password@postgres:5432/secure_sdlc
+      REDIS_URL: redis://redis:6379/0
+      APP_ENV: development
+      LOG_LEVEL: INFO
+      SECRET_KEY: dev-secret-key-change-in-production-xx
+      OTEL_SERVICE_NAME: multi-agent-secure-sdlc
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  agent-runtime:
+    build:
+      context: .
+      dockerfile: services/agent-runtime/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://sdlc_user:password@postgres:5432/secure_sdlc
+      APP_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  rag-core:
+    build:
+      context: .
+      dockerfile: services/rag-core/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://sdlc_user:password@postgres:5432/secure_sdlc
+      APP_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: sdlc_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: secure_sdlc
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sdlc_user -d secure_sdlc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.101.0
+    volumes:
+      - ./observability/otel/collector.yaml:/etc/otel-collector.yaml
+    command: ["--config=/etc/otel-collector.yaml"]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8888:8888"
+
+volumes:
+  postgres_data:
+  redis_data:

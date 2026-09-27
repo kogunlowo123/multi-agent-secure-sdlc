@@ -1,0 +1,34 @@
+// Detect anomalous agent authentication patterns in Entra ID (Azure AD)
+// that may indicate credential theft or misuse of agent service principals.
+//
+// Alert: Agent service principal used from unexpected location or unusual hours
+
+let expected_agent_ids = dynamic([
+    "secure-sdlc-api",
+    "secure-sdlc-agent-runtime",
+    "secure-sdlc-rag-core"
+]);
+
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where AppDisplayName in (expected_agent_ids)
+| where ResultType == "0"  // Successful sign-ins only
+| extend
+    HourOfDay = datetime_part("Hour", TimeGenerated),
+    Country = tostring(LocationDetails.countryOrRegion)
+| where
+    // Outside business hours (adjust per org)
+    HourOfDay !between (6 .. 22)
+    or
+    // From unexpected country (adjust per org deployment)
+    Country !in ("United States", "")
+| project
+    TimeGenerated,
+    AppDisplayName,
+    UserPrincipalName,
+    IPAddress,
+    Country,
+    HourOfDay,
+    ResultType,
+    CorrelationId
+| order by TimeGenerated desc

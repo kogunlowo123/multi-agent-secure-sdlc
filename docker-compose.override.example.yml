@@ -1,0 +1,29 @@
+version: "3.9"
+
+# Copy this file to docker-compose.override.yml for local development overrides
+# docker-compose.override.yml is git-ignored
+
+services:
+  api:
+    volumes:
+      - ./services/api/src:/app/src
+    environment:
+      APP_ENV: development
+      LOG_LEVEL: DEBUG
+      AZURE_OPENAI_ENDPOINT: ""
+      AZURE_OPENAI_API_KEY: ""
+    command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  agent-runtime:
+    volumes:
+      - ./services/agent-runtime/src:/app/src
+    environment:
+      LOG_LEVEL: DEBUG
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"

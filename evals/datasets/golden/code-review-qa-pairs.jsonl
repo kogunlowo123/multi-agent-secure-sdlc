@@ -1,0 +1,5 @@
+{"id": "cr-001", "input": {"code": "import subprocess\nsubprocess.run(user_cmd, shell=True)", "language": "python"}, "expected": {"min_findings": 1, "required_cwe": ["CWE-78"], "required_severity": ["HIGH", "CRITICAL"]}}
+{"id": "cr-002", "input": {"code": "result = eval(user_expression)", "language": "python"}, "expected": {"min_findings": 1, "required_cwe": ["CWE-94"], "required_severity": ["CRITICAL"]}}
+{"id": "cr-003", "input": {"code": "import pickle\nobj = pickle.loads(untrusted_data)", "language": "python"}, "expected": {"min_findings": 1, "required_cwe": ["CWE-502"], "required_severity": ["CRITICAL"]}}
+{"id": "cr-004", "input": {"code": "import hashlib\nhash = hashlib.md5(password.encode()).hexdigest()", "language": "python"}, "expected": {"min_findings": 1, "required_cwe": ["CWE-327"], "required_severity": ["HIGH"]}}
+{"id": "cr-005", "input": {"code": "import secrets\nimport hashlib\ntoken = secrets.token_urlsafe(32)\nhash = hashlib.sha256(data.encode()).hexdigest()", "language": "python"}, "expected": {"max_critical_high": 0}}

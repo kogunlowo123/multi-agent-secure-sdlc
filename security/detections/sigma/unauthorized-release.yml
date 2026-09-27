@@ -1,0 +1,33 @@
+title: Unauthorized Release Gate Bypass Attempt
+id: a4f8e2d1-3b7c-4e9a-b5f6-1c2d3e4f5a6b
+status: stable
+description: >
+  Detects attempts to bypass the release gate by calling the release
+  endpoint with fraudulent approval counts or manipulated evidence.
+author: Security Operations
+date: 2024/01/01
+logsource:
+  category: webserver
+  service: secure-sdlc-api
+detection:
+  selection_endpoint:
+    cs-uri-stem|contains: "/api/v1/release/gate"
+    cs-method: POST
+  selection_suspicious:
+    - sc-status: 200
+      approvals_received|gt: 10
+    - sc-status: 200
+      required_approvals: 0
+  condition: selection_endpoint and selection_suspicious
+fields:
+  - ClientIP
+  - cs-uri-stem
+  - cs-method
+  - sc-status
+  - trace_id
+falsepositives:
+  - Legitimate load testing
+level: high
+tags:
+  - attack.defense_evasion
+  - attack.T1562

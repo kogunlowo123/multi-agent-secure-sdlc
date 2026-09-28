@@ -211,8 +211,14 @@ class SASTScanTool:
         ]
 
         for line_num, line in enumerate(lines, 1):
+            # Strip comment portion (text after '#') to avoid false positives
+            # where patterns appear only inside comments.
+            stripped = line.lstrip()
+            if stripped.startswith("#"):
+                continue
+            line_code = line.split("#")[0]
             for p in patterns:
-                if p["pattern"] in line:
+                if p["pattern"] in line_code:
                     results.append(
                         {
                             "check_id": p["rule_id"],
